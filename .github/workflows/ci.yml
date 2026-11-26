@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 규칙 시험 + 타입 검사 + 서버 + 웹 연습판
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: 규칙 시험 (펫·명령·카톡 글 읽기)
+        run: npm test
+      - name: 타입 검사
+        run: npm run typecheck
+      - name: 서버가 답하는지
+        run: |
+          (DATA_DIR=/tmp/tp BOT_NAME=봇 node server/main.ts &) ; sleep 1
+          curl -sf localhost:8790/api/kakao -d '{"room":"방","text":"[민지] [오후 2:04] 안녕"}'
+          r=$(curl -sf localhost:8790/api/kakao -d '{"room":"방","text":"[민지] [오후 2:04] 안녕\n[준호] [오후 2:05] /도움말\n[봇] [오후 2:05] /상태"}')
+          echo "$r"; echo "$r" | grep -q '알이 하나 생겼어요'
+          [ "$(echo "$r" | grep -o '알 (따뜻함' | wc -l)" = 0 ] # 봇 자기 말에는 답하지 않음
+          curl -sf -X POST localhost:8790/api/due
+      - name: Docker 이미지
+        run: docker build -t talkpet .
+      - name: 웹 연습판 빌드
+        run: npm run build
+      - name: 웹 연습판 확인 (headless Chrome)
+        run: |
+          npx playwright install --with-deps chromium >/dev/null
+          (cd dist && python3 -m http.server 8765 >/dev/null 2>&1 &)
+          sleep 1
+          node scripts/smoke.mjs
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: dist
+
+  deploy:
+    name: GitHub Pages 배포
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

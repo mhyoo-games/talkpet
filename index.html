@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffe9b8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%90%A3%3C/text%3E%3C/svg%3E">
+<title>톡펫 — 단톡방에서 다 같이 키우는 펫</title>
+<meta name="description" content="단톡방 모두가 함께 밥 주고 놀아 주며 키우는 펫. 돌보는 방식에 따라 다른 모습으로 자라요.">
+<style>
+  @font-face { font-family: Galmuri; src: url(fonts/Galmuri11.woff2) format('woff2'); font-weight: normal; }
+  @font-face { font-family: Galmuri; src: url(fonts/Galmuri11-Bold.woff2) format('woff2'); font-weight: bold; }
+  :root { --bg: #fff8ea; --chat: #f3e3c3; --me: #ffd36b; --bot: #fff; --ink: #4a3426; --soft: #8a6e57; --line: #e6cfa6; --accent: #e0793a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+  body { display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  header { padding: 10px 14px 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  header h1 { margin: 0; font: bold 22px Galmuri, sans-serif; color: var(--accent); }
+  header p { margin: 0; color: var(--soft); font-size: 13px; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 300px; gap: 12px; padding: 0 12px 12px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; } aside { order: -1; } #card { max-height: 30vh; } }
+  .room { display: flex; flex-direction: column; min-height: 0; background: var(--chat); border: 2px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .room-head { padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--soft); flex-wrap: wrap; }
+  #log { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { display: grid; max-width: 82%; gap: 2px; }
+  .msg .name { font-size: 12px; color: var(--soft); }
+  .msg .bubble { padding: 8px 11px; border-radius: 4px 14px 14px 14px; background: var(--bot); white-space: pre-wrap; word-break: break-word; box-shadow: 0 1px 0 rgba(0,0,0,.06); }
+  .msg .time { font-size: 11px; color: var(--soft); }
+  .msg.me { align-self: flex-end; justify-items: end; }
+  .msg.me .name { display: none; }
+  .msg.me .bubble { background: var(--me); border-radius: 14px 4px 14px 14px; }
+  .msg.bot .name { color: var(--accent); font-weight: bold; }
+  .msg.bot .bubble { border: 1.5px solid #f1b98f; }
+  .quick { display: flex; gap: 6px; padding: 8px 10px 0; overflow-x: auto; }
+  .quick button, .who button, .tools button { flex: none; border: 1.5px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+  .quick button:hover, .who button:hover { border-color: var(--accent); }
+  form { display: flex; gap: 8px; padding: 8px 10px 10px; }
+  #text { flex: 1; min-width: 0; border: 2px solid var(--line); border-radius: 12px; padding: 9px 12px; font: inherit; background: #fff; }
+  #text:focus { outline: none; border-color: var(--accent); }
+  form button { border: 0; background: var(--accent); color: #fff; border-radius: 12px; padding: 0 16px; font: bold 15px inherit; cursor: pointer; }
+  .who { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .who::before { content: '말하는 사람'; font-size: 12px; color: var(--soft); }
+  .who button.on { background: var(--me); border-color: #e7b23d; font-weight: bold; }
+  aside { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  #card { margin: 0; padding: 12px; background: #fff; border: 2px solid var(--line); border-radius: 16px; white-space: pre-wrap; font: 14px/1.55 system-ui, sans-serif; overflow: auto; }
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .tools span { font-size: 12px; color: var(--soft); width: 100%; }
+  #reset { color: #b5462b; }
+  footer { padding: 0 14px 10px; font-size: 11px; color: var(--soft); }
+</style>
+<script>(function(){var id='G-J2XRD7X74X';if(navigator.webdriver||!/\.github\.io$/.test(location.hostname))return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id,{allow_google_signals:false,allow_ad_personalization_signals:false});var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s)})();</script>
+</head>
+<body>
+<header>
+  <h1>톡펫</h1>
+  <p>단톡방 모두가 함께 키우는 펫 — 여기서는 여러 사람인 척 미리 해 볼 수 있어요</p>
+</header>
+<main>
+  <section class="room">
+    <div class="room-head"><span>🏠 연습 단톡방</span><span id="clock"></span></div>
+    <div id="log" aria-live="polite"></div>
+    <div class="quick">
+      <button type="button" data-say="/상태">/상태</button>
+      <button type="button" data-say="/밥">🍚 밥</button>
+      <button type="button" data-say="/놀기">⚽ 놀기</button>
+      <button type="button" data-say="/씻기">🛁 씻기</button>
+      <button type="button" data-say="/치우기">🧹 치우기</button>
+      <button type="button" data-say="/재우기">🌙 재우기</button>
+      <button type="button" data-say="/약">💊 약</button>
+      <button type="button" data-say="/쓰다듬기">🤚 쓰다듬기</button>
+      <button type="button" data-say="/순위">🏆 순위</button>
+      <button type="button" data-say="/도움말">❓</button>
+    </div>
+    <form id="form" autocomplete="off">
+      <input id="text" placeholder="메시지 (예: 몽글아 놀자, /밥)" maxlength="300">
+      <button type="submit">보내기</button>
+    </form>
+  </section>
+  <aside>
+    <div class="who" id="who"></div>
+    <pre id="card"></pre>
+    <div class="tools">
+      <span>시간 빨리 감기 (펫이 그동안 한 말도 보여요)</span>
+      <button type="button" data-skip="1">⏩ 1시간</button>
+      <button type="button" data-skip="6">⏩ 6시간</button>
+      <button type="button" data-skip="24">⏩ 하루</button>
+      <button type="button" id="reset">처음부터</button>
+    </div>
+  </aside>
+</main>
+<footer>만든 사람: 심심풀이 · 글꼴: 갈무리 (SIL OFL 1.1) · 이 화면의 펫과 대화는 이 브라우저에만 저장돼요</footer>
+<script type="module" src="main.js"></script>
+</body>
+</html>
